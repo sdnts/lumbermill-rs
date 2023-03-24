@@ -172,7 +172,7 @@ macro_rules! __internal_log {
 
   // entrypoint
   ($lvl:expr, $($fields:tt)+) => {
-    $crate::LOGGER.log($lvl, $crate::__internal_log!({
+    $crate::LOGGER.log($crate::__internal_log!({
       ("level", format!("{}", $lvl)),
       ("file", format!("{}:{}", file!(), line!())),
       ("mod", format!("{}", module_path!()))

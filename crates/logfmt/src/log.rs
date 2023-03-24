@@ -20,10 +20,3 @@ impl Display for LogLevel {
     }
   }
 }
-
-#[derive(Debug)]
-pub struct Log {
-  pub level: LogLevel,
-  pub keys: &'static [&'static str],
-  pub values: Vec<String>,
-}

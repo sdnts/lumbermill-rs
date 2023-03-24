@@ -1,4 +1,6 @@
-pub mod log;
+mod log;
+mod logger;
 mod macros;
 
-pub use log::{Log, LogLevel};
+pub use log::LogLevel;
+pub use logger::LOGGER;
