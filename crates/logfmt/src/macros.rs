@@ -146,6 +146,29 @@ macro_rules! error {
   };
 }
 
+/// Log at the `Fatal` level
+///
+/// This functions exactly the same way as [`trace!`], refer to it for details
+/// and examples.
+#[macro_export]
+macro_rules! fatal {
+  ($($k:ident).+ = $v:expr, $($fields:tt)*) => {
+    $crate::__internal_log!($crate::LogLevel::Fatal, $($k).+ = $v, $($fields)*)
+  };
+  ($($k:ident).+ = ?$v:expr, $($fields:tt)*) => {
+    $crate::__internal_log!($crate::LogLevel::Fatal, $($k).+ = ?$v, $($fields)*)
+  };
+  ($($k:ident).+, $($fields:tt)*) => {
+    $crate::__internal_log!($crate::LogLevel::Fatal, $($k).+, $($fields)*)
+  };
+  (?$($k:ident).+, $($fields:tt)*) => {
+    $crate::__internal_log!($crate::LogLevel::Fatal, ?$($k).+, $($fields)*)
+  };
+  ($($msg:tt)+) => {
+    $crate::__internal_log!($crate::LogLevel::Fatal, { }, $($msg)+)
+  };
+}
+
 /// Internal-only, do not use directly. All public macros converge here.
 #[doc(hidden)]
 #[macro_export]

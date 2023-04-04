@@ -11,6 +11,7 @@ pub enum LogLevel {
   Info,
   Warn,
   Error,
+  Fatal,
 }
 
 impl LogLevel {
@@ -21,6 +22,7 @@ impl LogLevel {
       Self::Info => 10,
       Self::Warn => 11,
       Self::Error => 9,
+      Self::Fatal => 9,
     }
   }
 }
@@ -33,6 +35,7 @@ impl Debug for LogLevel {
       Self::Info => f.write_str("info"),
       Self::Warn => f.write_str("warn"),
       Self::Error => f.write_str("error"),
+      Self::Fatal => f.write_str("fatal"),
     }
   }
 }
@@ -45,6 +48,7 @@ impl Display for LogLevel {
       Self::Info => f.write_str("INF"),
       Self::Warn => f.write_str("WRN"),
       Self::Error => f.write_str("ERR"),
+      Self::Fatal => f.write_str("FTL"),
     }
   }
 }
