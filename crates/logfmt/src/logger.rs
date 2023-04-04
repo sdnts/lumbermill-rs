@@ -1,38 +1,68 @@
-use crate::{log::Log, LogLevel};
-use once_cell::sync::Lazy;
+use crate::log::{Log, LogFormat, LogLevel};
+use once_cell::sync::OnceCell;
 use std::io::stdout;
 
-pub static MAX_LOG_LEVEL: LogLevel = LogLevel::Trace;
+pub static LOGGER: OnceCell<Logger> = OnceCell::new();
 
+#[derive(Debug)]
 pub struct Logger {
-  // format: "pretty" | "compact"
-  // common_fields
-  // file: File,
+  format: LogFormat,
+  min_level: LogLevel,
 }
-pub static LOGGER: Lazy<Logger> = Lazy::new(|| {
-  // let dir = "logs";
-  // let dir = "/var/log/toph";
-
-  // fs::create_dir_all(dir).expect("Could not create log directory");
-  // let file = File::options()
-  //   .append(true)
-  //   .create(true)
-  //   .open(format!("{}/{}", dir, "node.log"))
-  //   .expect("Could not open file");
-
-  Logger {}
-});
 
 impl Logger {
-  #[cfg(debug_assertions)]
-  pub fn log(&self, log: Log) {
-    _ = log.pretty(&mut stdout().lock());
-    println!();
+  pub fn level(mut self, level: LogLevel) -> Self {
+    self.min_level = level;
+    self
   }
 
-  #[cfg(not(debug_assertions))]
-  pub fn log(&mut self, log: Log) {
-    _ = log.compact(&mut stdout().lock());
+  pub fn format(mut self, format: LogFormat) -> Self {
+    self.format = format;
+    self
+  }
+
+  pub fn pretty(mut self) -> Self {
+    self.format = LogFormat::Pretty;
+    self
+  }
+
+  pub fn compact(mut self) -> Self {
+    self.format = LogFormat::Compact;
+    self
+  }
+
+  pub fn init(self) {
+    LOGGER
+      .set(self)
+      .expect("Logger can only be initialized once");
+  }
+
+  pub fn log(&self, log: Log) {
+    if log.level < self.min_level {
+      return;
+    }
+
+    {
+      let writer = &mut stdout().lock();
+      match self.format {
+        LogFormat::Pretty => {
+          log.pretty(writer).expect("log write must not fail")
+        }
+        LogFormat::Compact => {
+          log.compact(writer).expect("log write must not fail")
+        }
+      }
+      println!(); // Flush stdout buffer
+    }
+  }
+}
+
+impl Default for Logger {
+  fn default() -> Self {
+    Self {
+      format: LogFormat::Pretty,
+      min_level: LogLevel::Info,
+    }
   }
 }
 
@@ -42,7 +72,7 @@ mod tests {
 
   #[test]
   fn stdout() {
-    LOGGER.log(Log {
+    LOGGER.get().unwrap().log(Log {
       timestamp: OffsetDateTime::now_utc(),
       level: crate::LogLevel::Trace,
       module: module_path!(),
@@ -60,7 +90,7 @@ mod tests {
       ],
     });
 
-    LOGGER.log(Log {
+    LOGGER.get().unwrap().log(Log {
       timestamp: OffsetDateTime::now_utc(),
       level: crate::LogLevel::Debug,
       module: module_path!(),
@@ -75,7 +105,7 @@ mod tests {
       ],
     });
 
-    LOGGER.log(Log {
+    LOGGER.get().unwrap().log(Log {
       timestamp: OffsetDateTime::now_utc(),
       level: crate::LogLevel::Info,
       module: module_path!(),
@@ -90,7 +120,7 @@ mod tests {
       ],
     });
 
-    LOGGER.log(Log {
+    LOGGER.get().unwrap().log(Log {
       timestamp: OffsetDateTime::now_utc(),
       level: crate::LogLevel::Warn,
       module: module_path!(),
@@ -105,7 +135,7 @@ mod tests {
       ],
     });
 
-    LOGGER.log(Log {
+    LOGGER.get().unwrap().log(Log {
       timestamp: OffsetDateTime::now_utc(),
       level: crate::LogLevel::Error,
       module: module_path!(),

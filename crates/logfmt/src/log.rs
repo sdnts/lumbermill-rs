@@ -53,6 +53,12 @@ impl Display for LogLevel {
   }
 }
 
+#[derive(Debug)]
+pub enum LogFormat {
+  Pretty,
+  Compact,
+}
+
 pub struct Log<'a> {
   pub timestamp: OffsetDateTime,
   pub level: LogLevel,
@@ -92,7 +98,7 @@ impl<'a> Log<'a> {
     write!(w, "\x1B[38;5;243mmod=\x1B[0m{} ", self.module)?;
     write!(w, "\x1B[38;5;243msrc=\x1B[0m{}:{} ", self.file, self.line)?;
 
-    writeln!(w, "\x1B[0m")?;
+    write!(w, "\x1B[0m")?;
 
     Ok(())
   }

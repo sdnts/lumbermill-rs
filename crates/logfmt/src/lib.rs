@@ -4,5 +4,5 @@ mod macros;
 
 pub use time;
 
-pub use log::LogLevel;
-pub use logger::LOGGER;
+pub use log::{LogFormat, LogLevel};
+pub use logger::{Logger, LOGGER};

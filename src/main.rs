@@ -1,13 +1,19 @@
 use anyhow::Result;
-use logfmt::{info, trace};
+use logfmt::{info, trace, LogLevel, Logger};
 use std::{io::Write, net::TcpListener};
 
 fn main() -> Result<()> {
+  #[cfg(debug_assertions)]
+  Logger::default().pretty().level(LogLevel::Trace).init();
+
+  #[cfg(not(debug_assertions))]
+  Logger::default().compact().level(LogLevel::Trace).init();
+
   let location = hostname::get()?;
   let location = location.to_string_lossy();
 
   let addr = "0.0.0.0";
-  let port = "7096";
+  let port = 7096;
 
   let listener = TcpListener::bind(format!("{addr}:{port}"))?;
   let response = format!(
