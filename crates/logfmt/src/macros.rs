@@ -152,34 +152,38 @@ macro_rules! error {
 macro_rules! __internal_log {
   // kv muncher
   ({ $($kv:expr),* }, $($k:ident).+ = $v:expr, $($fields:tt)*) => {
-    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format!("{}", $v)) }, $($fields)*)
+    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format_args!("{}", $v)) }, $($fields)*)
   };
   ({ $($kv:expr),* }, $($k:ident).+ = ?$v:expr, $($fields:tt)*) => {
-    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format!("{:?}", $v)) }, $($fields)*)
+    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format_args!("{:?}", $v)) }, $($fields)*)
   };
   ({ $($kv:expr),* }, $($k:ident).+, $($fields:tt)*) => {
-    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format!("{}", $($k).+)) }, $($fields)*)
+    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format_args!("{}", $($k).+)) }, $($fields)*)
   };
   ({ $($kv:expr),* }, ?$($k:ident).+, $($fields:tt)*) => {
-    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format!("{:?}", $($k).+)) }, $($fields)*)
+    $crate::__internal_log!({ $($kv,)* (stringify!($($k).+), format_args!("{:?}", $($k).+)) }, $($fields)*)
   };
   ({ $($kv:expr),* }, $($msg:tt)*) => {
-    $crate::__internal_log!({ $($kv,)* ("message", format!($($msg)*)) })
+    $crate::__internal_log!({ $($kv,)* ("message", format_args!($($msg)*)) })
   };
   ({ $($kv:expr),* }) => {
-    vec![ $($kv,)* ]
+    &[ $($kv,)* ]
   };
 
   // entrypoint
   ($lvl:expr, $($fields:tt)+) => {
-    $crate::LOGGER.lock().log($crate::__internal_log!({
-      ("level", format!("{}", $lvl)),
-      ("file", format!("{}:{}", file!(), line!())),
-      ("mod", format!("{}", module_path!()))
-    }, $($fields)*));
+    $crate::LOGGER.log($crate::log::Log {
+      timestamp: $crate::time::OffsetDateTime::now_utc(),
+      level: $lvl,
+      module: module_path!(),
+      file: file!(),
+      line: line!(),
+      kv: $crate::__internal_log!({ }, $($fields)*)
+    });
   };
 }
 
+#[cfg(test)]
 mod tests {
   struct Addr<'a> {
     ip: &'a str,

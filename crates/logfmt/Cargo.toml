@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 once_cell = "1.17.1"
-parking_lot = "0.12.1"
+time = { version = "0.3.20", features = ["std", "formatting", "local-offset"] }
