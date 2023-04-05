@@ -4,10 +4,18 @@ use std::{io::Write, net::TcpListener};
 
 fn main() -> Result<()> {
   #[cfg(debug_assertions)]
-  Logger::default().pretty().level(LogLevel::Trace).init();
+  Logger::default()
+    .level(LogLevel::Trace)
+    .compact()
+    .file("logs")
+    .init()?;
 
   #[cfg(not(debug_assertions))]
-  Logger::default().compact().level(LogLevel::Trace).init();
+  Logger::default()
+    .level(LogLevel::Trace)
+    .compact()
+    .file("/var/log/toph")
+    .init()?;
 
   let location = hostname::get()?;
   let location = location.to_string_lossy();
@@ -39,8 +47,7 @@ Content-Type: text/html
   </body>
 </html>
 
-"
-  );
+");
 
   info!(addr, port, "Listening");
 

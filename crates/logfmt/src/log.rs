@@ -70,7 +70,21 @@ pub struct Log<'a> {
 }
 
 impl<'a> Log<'a> {
-  pub fn pretty<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
+  pub fn write<Writer: io::Write>(
+    &self,
+    w: &mut Writer,
+    format: &LogFormat,
+  ) -> io::Result<()> {
+    match format {
+      LogFormat::Pretty => self.pretty(w),
+      LogFormat::Compact => self.compact(w),
+      LogFormat::Json => self.json(w),
+    }
+  }
+}
+
+impl<'a> Log<'a> {
+  fn pretty<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
     // Because of the way our macros are set up, the KV list is ordered, which means
     // that the message will always be the last element
     let (message, kv) =
@@ -98,13 +112,14 @@ impl<'a> Log<'a> {
 
     write!(w, "\x1B[38;5;243mmod=\x1B[0m{} ", self.module)?;
     write!(w, "\x1B[38;5;243msrc=\x1B[0m{}:{} ", self.file, self.line)?;
-
     write!(w, "\x1B[0m")?;
+
+    writeln!(w)?;
 
     Ok(())
   }
 
-  pub fn compact<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
+  fn compact<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
     // Because of the way our macros are set up, the KV list is ordered, which means
     // that the message will always be the last element
     let (message, kv) =
@@ -122,12 +137,14 @@ impl<'a> Log<'a> {
     write!(w, "msg=\"{}\" ", message.1)?;
     kv.iter().try_for_each(|(k, v)| write!(w, "{}={} ", k, v))?;
     write!(w, "mod={} ", self.module)?;
-    write!(w, "src={}:{} ", self.file, self.line)?;
+    write!(w, "src={}:{}", self.file, self.line)?;
+
+    writeln!(w)?;
 
     Ok(())
   }
 
-  pub fn json<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
+  fn json<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
     // Because of the way our macros are set up, the KV list is ordered, which means
     // that the message will always be the last element
     let (message, kv) =
@@ -150,7 +167,8 @@ impl<'a> Log<'a> {
     write!(w, "\"mod\":\"{}\",", self.module)?;
     write!(w, "\"src\":\"{}:{}\"", self.file, self.line)?;
 
-    write!(w, "}}",)?;
+    write!(w, "}}")?;
+    writeln!(w)?;
 
     Ok(())
   }

@@ -1,18 +1,67 @@
 use crate::log::{Log, LogFormat, LogLevel};
 use once_cell::sync::OnceCell;
-use std::io::stdout;
+use parking_lot::Mutex;
+use std::{
+  fs::File,
+  io::{stdout, BufWriter, Stdout, Write},
+  path::PathBuf,
+  sync::atomic::{AtomicUsize, Ordering},
+};
+use thiserror::Error;
+use time::{Duration, OffsetDateTime, Time};
 
 pub static LOGGER: OnceCell<Logger> = OnceCell::new();
 
+#[derive(Debug, Error)]
+pub enum InitError {
+  #[error("The directory `{0}` does not exist")]
+  DirectoryDoesNotExist(PathBuf),
+
+  #[error("Loggers can only be initialized once")]
+  MultipleInitializations,
+}
+
 #[derive(Debug)]
 pub struct Logger {
+  level: LogLevel,
   format: LogFormat,
-  min_level: LogLevel,
+  stdout: Option<Stdout>,
+  directory: PathBuf,
+  file: Option<Mutex<BufWriter<File>>>,
+  roll_date: AtomicUsize,
+}
+
+impl Logger {
+  fn create_file(&self, now: OffsetDateTime) -> File {
+    let file = self.directory.join(format!("{}.log", now.date()));
+    File::options()
+      .create(true)
+      .append(true)
+      .open(file)
+      .expect("Must have write access to file system")
+  }
+
+  fn roll_file(&self, file: &mut File) {
+    let now = OffsetDateTime::now_utc();
+    if now.unix_timestamp() as usize > self.roll_date.load(Ordering::Acquire) {
+      *file = self.create_file(now);
+      _ = self.roll_date.fetch_update(
+        Ordering::Acquire,
+        Ordering::Acquire,
+        |_| {
+          let roll_date: OffsetDateTime = now + Duration::DAY;
+          let roll_date = roll_date.replace_time(Time::MIDNIGHT);
+          let roll_date = roll_date.unix_timestamp() as usize;
+          Some(roll_date)
+        },
+      );
+    }
+  }
 }
 
 impl Logger {
   pub fn level(mut self, level: LogLevel) -> Self {
-    self.min_level = level;
+    self.level = level;
     self
   }
 
@@ -21,38 +70,68 @@ impl Logger {
     self
   }
 
-  pub fn pretty(mut self) -> Self {
-    self.format = LogFormat::Pretty;
+  pub fn pretty(self) -> Self {
+    self.format(LogFormat::Pretty)
+  }
+
+  pub fn compact(self) -> Self {
+    self.format(LogFormat::Compact)
+  }
+
+  pub fn stdout(mut self, s: bool) -> Self {
+    if s {
+      self.stdout = Some(stdout())
+    } else {
+      self.stdout = None;
+    }
+
     self
   }
 
-  pub fn compact(mut self) -> Self {
-    self.format = LogFormat::Compact;
+  pub fn file<Dir: Into<PathBuf>>(mut self, directory: Dir) -> Self {
+    let directory: PathBuf = directory.into();
+    self.directory = directory;
     self
   }
 
-  pub fn init(self) {
+  pub fn init(mut self) -> Result<(), InitError> {
+    if !self.directory.exists() {
+      return Err(InitError::DirectoryDoesNotExist(self.directory.to_owned()));
+    }
+
+    let now = OffsetDateTime::now_utc();
+
+    let file = self.create_file(now);
+    let file = BufWriter::new(file);
+    let file = Mutex::new(file);
+    self.file = Some(file);
+
     LOGGER
       .set(self)
-      .expect("Logger can only be initialized once");
+      .map_err(|_| InitError::MultipleInitializations)?;
+
+    Ok(())
   }
 
   pub fn log(&self, log: Log) {
-    if log.level < self.min_level {
+    if log.level < self.level {
       return;
     }
 
-    {
-      let writer = &mut stdout().lock();
-      match self.format {
-        LogFormat::Pretty => {
-          log.pretty(writer).expect("log write must not fail")
-        }
-        LogFormat::Compact => {
-          log.compact(writer).expect("log write must not fail")
-        }
-      }
-      println!(); // Flush stdout buffer
+    if let Some(stdout) = &self.stdout {
+      let writer = &mut stdout.lock();
+      log
+        .write(writer, &self.format)
+        .expect("log write must not fail");
+    }
+
+    if let Some(file) = &self.file {
+      let mut guard = file.lock();
+      let writer = guard.get_mut();
+      self.roll_file(writer);
+      log
+        .write(writer, &self.format)
+        .expect("log write must not fail");
     }
   }
 }
@@ -60,8 +139,20 @@ impl Logger {
 impl Default for Logger {
   fn default() -> Self {
     Self {
+      level: LogLevel::Info,
       format: LogFormat::Pretty,
-      min_level: LogLevel::Info,
+      stdout: Some(stdout()),
+      directory: PathBuf::from("logs"),
+      file: None,
+      roll_date: AtomicUsize::new(0),
+    }
+  }
+}
+
+impl Drop for Logger {
+  fn drop(&mut self) {
+    if let Some(file) = &mut self.file {
+      _ = file.get_mut().flush();
     }
   }
 }
