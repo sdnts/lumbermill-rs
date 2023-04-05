@@ -57,6 +57,7 @@ impl Display for LogLevel {
 pub enum LogFormat {
   Pretty,
   Compact,
+  Json,
 }
 
 pub struct Log<'a> {
@@ -115,13 +116,41 @@ impl<'a> Log<'a> {
       .timestamp
       .format_into(w, &Rfc3339)
       .expect("Timestamp is invalid. This is a bug.");
-    write!(w, " ",)?;
+    write!(w, " ")?;
 
     write!(w, "lvl={:?} ", self.level)?;
     write!(w, "msg=\"{}\" ", message.1)?;
     kv.iter().try_for_each(|(k, v)| write!(w, "{}={} ", k, v))?;
     write!(w, "mod={} ", self.module)?;
     write!(w, "src={}:{} ", self.file, self.line)?;
+
+    Ok(())
+  }
+
+  pub fn json<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
+    // Because of the way our macros are set up, the KV list is ordered, which means
+    // that the message will always be the last element
+    let (message, kv) =
+      self.kv.split_last().expect("A log message is required");
+
+    write!(w, "{{",)?;
+
+    use time::format_description::well_known::Rfc3339;
+    write!(w, "\"ts\":\"",)?;
+    self
+      .timestamp
+      .format_into(w, &Rfc3339)
+      .expect("Timestamp is invalid. This is a bug.");
+    write!(w, "\",")?;
+
+    write!(w, "\"lvl\":\"{:?}\",", self.level)?;
+    write!(w, "\"msg\":\"{}\",", message.1)?;
+    kv.iter()
+      .try_for_each(|(k, v)| write!(w, "\"{}\":\"{}\",", k, v))?;
+    write!(w, "\"mod\":\"{}\",", self.module)?;
+    write!(w, "\"src\":\"{}:{}\"", self.file, self.line)?;
+
+    write!(w, "}}",)?;
 
     Ok(())
   }
