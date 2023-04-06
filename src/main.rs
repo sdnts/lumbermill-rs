@@ -4,18 +4,18 @@ use std::{io::Write, net::TcpListener};
 
 fn main() -> Result<()> {
   #[cfg(debug_assertions)]
-  Logger::default()
-    .level(LogLevel::Trace)
-    .compact()
-    .file("logs")
-    .init()?;
+  Logger::default().level(LogLevel::Trace).pretty().init();
 
   #[cfg(not(debug_assertions))]
-  Logger::default()
-    .level(LogLevel::Trace)
-    .compact()
-    .file("/var/log/toph")
-    .init()?;
+  {
+    let dir = "logs";
+    std::fs::create_dir_all(dir)?;
+    Logger::default()
+      .level(LogLevel::Trace)
+      .compact()
+      .file(dir, logfmt::RollInterval::Daily)
+      .init();
+  }
 
   let location = hostname::get()?;
   let location = location.to_string_lossy();

@@ -63,10 +63,10 @@ pub enum LogFormat {
 pub struct Log<'a> {
   pub timestamp: OffsetDateTime,
   pub level: LogLevel,
+  pub kv: &'a [(&'static str, Arguments<'a>)],
   pub module: &'a str,
   pub file: &'a str,
   pub line: u32,
-  pub kv: &'a [(&'static str, Arguments<'a>)],
 }
 
 impl<'a> Log<'a> {
