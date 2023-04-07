@@ -12,3 +12,15 @@ version = "0.0.1"
 [dependencies]
 parking_lot = "0.12.1"
 time = { version = "0.3.20", features = ["std", "formatting"] }
+
+[[example]]
+name = "01-defaults"
+
+[[example]]
+name = "02-formats"
+
+[[example]]
+name = "03-levels"
+
+[[example]]
+name = "04-log-files"

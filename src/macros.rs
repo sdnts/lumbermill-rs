@@ -167,7 +167,7 @@ macro_rules! fatal {
     $crate::__internal_log!($crate::LogLevel::Fatal, ?$($k).+, $($fields)*)
   };
   ($($msg:tt)+) => {
-    $crate::__internal_log!($crate::LogLevel::Fatal, { }, $($msg)+)
+    $crate::__internal_log!($crate::LogLevel::Fatal, $($msg)+)
   };
 }
 

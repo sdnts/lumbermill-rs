@@ -1,3 +1,7 @@
+//! Hello there
+//!
+//! # Overview
+
 mod file;
 mod log;
 mod logger;

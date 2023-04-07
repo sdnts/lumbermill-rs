@@ -101,8 +101,8 @@ impl<'a> Log<'a> {
 
     write!(w, "\x1B[38;5;{}m{} ", self.level.color(), self.level)?;
 
-    if self.level == LogLevel::Error {
-      write!(w, "\x1B[38;5;9m{} ", message.1)?;
+    if self.level == LogLevel::Error || self.level == LogLevel::Fatal {
+      write!(w, "\x1B[38;5;9m{}\x1B[0m ", message.1)?;
     } else {
       write!(w, "\x1B[0m{} ", message.1)?;
     }

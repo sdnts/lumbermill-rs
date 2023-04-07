@@ -32,7 +32,8 @@ fn main() {
 }
 ```
 
-The `trace!`, `debug!`, `info!`, `warn!`, `error!` & `fatal!` are heavily inspired by `tracing`'s macros because they're so convenient!
+The `trace!`, `debug!`, `info!`, `warn!`, `error!` & `fatal!` are heavily inspired
+by `tracing`'s macros because they're good.
 
 The default logger prints pretty logs to `stdout` only, but you can configure the `Logger` to behave differently:
 
@@ -75,12 +76,21 @@ Logger::default().level(LogLevel::Trace).pretty().init();
 }
 ```
 
+### Examples
+
+[Examples](https://github.com/sdnts/lumbermill-rs/tree/main/examples) are a good entrypoint to learn about the library. Run them this way:
+
+```sh
+$ cargo run --example 01-defaults # Or replace this wil a different example's name
+```
+
+[Docs](https://docs.rs/lumbermill) usually go into more detail once you get the hang of things.
+
 ### Why?
 
 The `tracing` ecosystem is awesome, but it's also overkill for a lot of apps who
-only need structured logging and not a distributed tracing solution.
-
-The `log` crate is the obvious choice, but its `kv` module is a work-in-progress.
+only need structured logging and not a distributed tracing solution. The `log` crate
+is the obvious alternative, but its `kv` module is a work-in-progress.
 You are also unable to log key-value pairs that do not implement `Display`, which
 is incovenient.
 
