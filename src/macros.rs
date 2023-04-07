@@ -224,7 +224,7 @@ macro_rules! __internal_log {
   // entrypoint
   ($lvl:expr, $($fields:tt)+) => {
     $crate::LOGGER.get().expect("Logger was not initialized").log($crate::Log {
-      timestamp: $crate::time::OffsetDateTime::now_utc(),
+      timestamp: $crate::OffsetDateTime::now_utc(),
       level: $lvl,
       module: module_path!(),
       file: file!(),

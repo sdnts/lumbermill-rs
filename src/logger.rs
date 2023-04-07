@@ -104,12 +104,10 @@ impl Default for Logger {
 
 #[cfg(test)]
 mod tests {
-  use crate::{log::Log, time::OffsetDateTime, Logger, LOGGER};
+  use crate::{log::Log, OffsetDateTime, LOGGER};
 
   #[test]
   fn stdout() {
-    Logger::default().level(crate::LogLevel::Trace).init();
-
     LOGGER.get().unwrap().log(Log {
       timestamp: OffsetDateTime::now_utc(),
       level: crate::LogLevel::Trace,

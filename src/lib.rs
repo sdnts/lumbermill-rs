@@ -28,4 +28,10 @@ mod stdout;
 pub use file::RollInterval;
 pub use log::{Log, LogFormat, LogLevel};
 pub use logger::{Logger, LOGGER};
-pub use time;
+pub use time::OffsetDateTime;
+
+#[cfg(test)]
+#[ctor::ctor]
+fn test_init() {
+  crate::Logger::default().init();
+}
