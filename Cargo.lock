@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "lumbermill"
-version = "0.0.4"
+version = "0.1.0"
 dependencies = [
  "ctor",
  "parking_lot",
