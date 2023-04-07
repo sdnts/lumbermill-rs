@@ -1,15 +1,14 @@
-[workspace]
-members = ["crates/*"]
-
 [package]
-name = "toph"
-version = "0.1.0"
+name = "lumbermill"
+description = "Simple structured logging"
 edition = "2021"
+license = "MIT"
+authors = ["Siddhant <sdnts@sdnts.dev>"]
+categories = ["log", "logger"]
+homepage = "https://github.com/sdnts/lumbermill"
+repository = "https://github.com/sdnts/lumbermill"
+version = "0.0.1"
 
 [dependencies]
-anyhow = "1.0.69"
-hostname = "0.3.1"
-lumbermill = { path = "crates/lumbermill" }
-
-[profile.release]
-strip = true
+parking_lot = "0.12.1"
+time = { version = "0.3.20", features = ["std", "formatting"] }

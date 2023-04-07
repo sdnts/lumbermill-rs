@@ -8,9 +8,4 @@ jobs:
       - uses: dtolnay/rust-toolchain@nightly
         with:
           targets: x86_64-unknown-linux-musl
-      - run: cargo test --all
-      - run: cargo build --release --target x86_64-unknown-linux-musl
-      - uses: actions/upload-artifact@v3
-        with:
-          name: toph
-          path: target/x86_64-unknown-linux-musl/release/toph
+      - run: cargo test
