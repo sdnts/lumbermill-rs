@@ -8,13 +8,15 @@
 ///
 /// # Examples
 /// ```
-/// use logfmt::trace;
+/// use lumbermill::{trace , Logger};
 ///
 /// #[derive(Debug)]
 /// struct Addr {
 ///   ip: &'static str,
 ///   port: usize
 /// };
+///
+/// Logger::default().init();
 ///
 /// let ip = "0.0.0.0";
 /// let port = 7096;
