@@ -119,8 +119,6 @@ mod tests {
       kv: &[
         ("service", format_args!("{}", "toph")),
         ("node", format_args!("{}", "fra")),
-        ("addr", format_args!("{}", "0.0.0.0")),
-        ("port", format_args!("{}", "7096")),
         (
           "message",
           format_args!("Accepted TCP connection from 172.45.22.190:62498"),
@@ -135,10 +133,7 @@ mod tests {
       file: file!(),
       line: line!(),
       kv: &[
-        ("service", format_args!("{}", "toph")),
-        ("node", format_args!("{}", "fra")),
-        ("addr", format_args!("{}", "0.0.0.0")),
-        ("port", format_args!("{}", "7096")),
+        ("addr", format_args!("{}", "https://postgres.org")),
         ("message", format_args!("Established connection to DB")),
       ],
     });
@@ -150,10 +145,7 @@ mod tests {
       file: file!(),
       line: line!(),
       kv: &[
-        ("service", format_args!("{}", "toph")),
-        ("node", format_args!("{}", "fra")),
         ("addr", format_args!("{}", "0.0.0.0")),
-        ("port", format_args!("{}", "7096")),
         ("message", format_args!("Listening on :7096")),
       ],
     });
@@ -165,10 +157,7 @@ mod tests {
       file: file!(),
       line: line!(),
       kv: &[
-        ("service", format_args!("{}", "toph")),
-        ("node", format_args!("{}", "fra")),
-        ("addr", format_args!("{}", "0.0.0.0")),
-        ("port", format_args!("{}", "7096")),
+        ("count", format_args!("{}", "9001")),
         ("message", format_args!("Too many items in queue")),
       ],
     });
@@ -180,10 +169,7 @@ mod tests {
       file: file!(),
       line: line!(),
       kv: &[
-        ("service", format_args!("{}", "toph")),
-        ("node", format_args!("{}", "fra")),
-        ("addr", format_args!("{}", "0.0.0.0")),
-        ("port", format_args!("{}", "7096")),
+        ("reason", format_args!("{}", "No connectivity")),
         ("message", format_args!("Database connection dropped")),
       ],
     });
@@ -195,10 +181,7 @@ mod tests {
       file: file!(),
       line: line!(),
       kv: &[
-        ("service", format_args!("{}", "toph")),
-        ("node", format_args!("{}", "fra")),
-        ("addr", format_args!("{}", "0.0.0.0")),
-        ("port", format_args!("{}", "7096")),
+        ("usage", format_args!("{}", "128MB")),
         ("message", format_args!("Out of memory")),
       ],
     });

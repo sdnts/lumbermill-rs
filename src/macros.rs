@@ -171,6 +171,32 @@ macro_rules! fatal {
   };
 }
 
+/// Log at the supplied level.
+///
+/// It is usually more succint to use the [`trace!`], [`debug!`], [`info!`],
+/// [`warn!`], [`error!`] or [`fatal!`] macros directly.
+///
+/// This functions exactly the same way as [`trace!`], except the first argument
+/// must always be a log level. Refer to it for details and examples.
+#[macro_export]
+macro_rules! log {
+  ($lvl:expr, $($k:ident).+ = $v:expr, $($fields:tt)*) => {
+    $crate::__internal_log!($lvl, $($k).+ = $v, $($fields)*)
+  };
+  ($lvl:expr, $($k:ident).+ = ?$v:expr, $($fields:tt)*) => {
+    $crate::__internal_log!($lvl, $($k).+ = ?$v, $($fields)*)
+  };
+  ($lvl:expr, $($k:ident).+, $($fields:tt)*) => {
+    $crate::__internal_log!($lvl, $($k).+, $($fields)*)
+  };
+  ($lvl:expr, ?$($k:ident).+, $($fields:tt)*) => {
+    $crate::__internal_log!($lvl, ?$($k).+, $($fields)*)
+  };
+  ($lvl:expr, $($msg:tt)+) => {
+    $crate::__internal_log!($lvl, $($msg)+)
+  };
+}
+
 /// Internal-only, do not use directly. All public macros converge here.
 #[doc(hidden)]
 #[macro_export]
@@ -210,6 +236,8 @@ macro_rules! __internal_log {
 
 #[cfg(test)]
 mod tests {
+  use crate::LogLevel;
+
   struct Addr<'a> {
     ip: &'a str,
     port: usize,
@@ -220,6 +248,7 @@ mod tests {
     let ip = "0.0.0.0";
     let port = 7096;
 
+    log!(LogLevel::Info, "Message");
     trace!("Message");
     trace!("Message {ip}");
     trace!("Message {ip} {port}");
@@ -232,6 +261,7 @@ mod tests {
     let ip = "0.0.0.0";
     let port = 7096;
 
+    log!(LogLevel::Info, "Message {ip:?}");
     trace!("Message {ip:?}");
     trace!("Message {ip:?} {port:?}");
     trace!("Message {:?}", ip);
@@ -244,6 +274,7 @@ mod tests {
     let port = 7096;
     let addr = Addr { ip, port };
 
+    log!(LogLevel::Info, ip, "Message {}", ip);
     trace!(ip, "Message {}", ip);
     trace!(ip, "Message {} {}", ip, port);
     trace!(ip, port, "Message {}", ip);
@@ -261,6 +292,7 @@ mod tests {
     let port = 7096;
     let addr = Addr { ip, port };
 
+    log!(LogLevel::Info, ?ip, "Message {}", ip);
     trace!(?ip, "Message {}", ip);
     trace!(?ip, "Message {} {}", ip, port);
     trace!(?ip, ?port, "Message {}", ip);

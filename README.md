@@ -5,7 +5,7 @@
 
 Simple structured logging.
 
-![Screenshot of log output]()
+![Screenshot of log output](./examples/logs.png)
 
 ### Usage
 
@@ -91,10 +91,10 @@ $ cargo run --example 01-defaults # Or replace this wil a different example's na
 The `tracing` ecosystem is awesome, but it's also overkill for a lot of apps who
 only need structured logging and not a distributed tracing solution. The `log` crate
 is the obvious alternative, but its `kv` module is a work-in-progress.
-You are also unable to log key-value pairs that do not implement `Display`, which
-is incovenient.
+You are also unable to log key-value pairs that do not implement `Display`, in
+a incovenient way.
 
-This library is a stop-gap till `log::kv` stabilizes. It marries `tracing`'s awesome
+This crate is a stop-gap till `log::kv` stabilizes. It marries `tracing`'s awesome
 `event!` macro to `log`'s simplicity. The plan is to eventually drop the custom
 macros in this crate and integrate with `log` directly.
 
