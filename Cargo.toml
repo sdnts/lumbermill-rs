@@ -7,7 +7,7 @@ authors = ["Siddhant <sdnts@sdnts.dev>"]
 categories = ["log", "logger"]
 homepage = "https://github.com/sdnts/lumbermill-rs"
 repository = "https://github.com/sdnts/lumbermill-rs"
-version = "0.0.2"
+version = "0.0.3"
 
 [dependencies]
 parking_lot = "0.12.1"
