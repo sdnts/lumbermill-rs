@@ -17,6 +17,16 @@ pub struct Logger {
 }
 
 impl Logger {
+  pub fn new() -> Self {
+    Self::default()
+  }
+
+  pub fn builder() -> Self {
+    Self::default()
+  }
+}
+
+impl Logger {
   pub fn level(mut self, level: LogLevel) -> Self {
     self.level = level;
     self
@@ -175,6 +185,21 @@ mod tests {
         ("addr", format_args!("{}", "0.0.0.0")),
         ("port", format_args!("{}", "7096")),
         ("message", format_args!("Database connection dropped")),
+      ],
+    });
+
+    LOGGER.get().unwrap().log(Log {
+      timestamp: OffsetDateTime::now_utc(),
+      level: crate::LogLevel::Fatal,
+      module: module_path!(),
+      file: file!(),
+      line: line!(),
+      kv: &[
+        ("service", format_args!("{}", "toph")),
+        ("node", format_args!("{}", "fra")),
+        ("addr", format_args!("{}", "0.0.0.0")),
+        ("port", format_args!("{}", "7096")),
+        ("message", format_args!("Out of memory")),
       ],
     });
   }
