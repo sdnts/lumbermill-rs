@@ -1,7 +1,12 @@
 [package]
 name = "lumbermill"
-version = "0.0.1"
+description = "Simple structured logging"
 edition = "2021"
+authors = ["Siddhant <sdnts@sdnts.dev>"]
+categories = ["log", "logger"]
+homepage = "https://github.com/sdnts/lumbermill"
+repository = "https://github.com/sdnts/lumbermill"
+version = "0.0.1"
 
 [dependencies]
 parking_lot = "0.12.1"
