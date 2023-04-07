@@ -92,7 +92,7 @@ impl<'a> Log<'a> {
 
     write!(
       w,
-      "\x1B[38;5;244m{:0>2}:{:0>2}:{:0>2}.{:0>3}Z ",
+      "\x1B[2m{:0>2}:{:0>2}:{:0>2}.{:0>3}Z\x1B[0m ",
       self.timestamp.hour(),
       self.timestamp.minute(),
       self.timestamp.second(),
@@ -108,10 +108,10 @@ impl<'a> Log<'a> {
     }
 
     kv.iter()
-      .try_for_each(|(k, v)| write!(w, "\x1B[38;5;243m{}=\x1B[0m{} ", k, v))?;
+      .try_for_each(|(k, v)| write!(w, "\x1B[2m{}=\x1B[0m{} ", k, v))?;
 
-    write!(w, "\x1B[38;5;243mmod=\x1B[0m{} ", self.module)?;
-    write!(w, "\x1B[38;5;243msrc=\x1B[0m{}:{} ", self.file, self.line)?;
+    write!(w, "\x1B[2mmod=\x1B[0m{} ", self.module)?;
+    write!(w, "\x1B[2msrc=\x1B[0m{}:{} ", self.file, self.line)?;
     write!(w, "\x1B[0m")?;
 
     writeln!(w)?;

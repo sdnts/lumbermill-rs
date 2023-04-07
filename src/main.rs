@@ -1,5 +1,5 @@
 use anyhow::Result;
-use logfmt::{info, trace, LogLevel, Logger};
+use lumbermill::{info, trace, LogLevel, Logger};
 use std::{io::Write, net::TcpListener};
 
 fn main() -> Result<()> {
@@ -13,7 +13,7 @@ fn main() -> Result<()> {
     Logger::default()
       .level(LogLevel::Trace)
       .compact()
-      .file(dir, logfmt::RollInterval::Daily)
+      .file(dir, lumbermill::RollInterval::Daily)
       .init();
   }
 

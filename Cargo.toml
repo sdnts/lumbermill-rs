@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.69"
 hostname = "0.3.1"
-logfmt = { path = "crates/logfmt" }
+lumbermill = { path = "crates/lumbermill" }
 
 [profile.release]
 strip = true

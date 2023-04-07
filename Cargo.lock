@@ -60,10 +60,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "logfmt"
-version = "0.1.0"
+name = "lumbermill"
+version = "0.0.1"
 dependencies = [
- "once_cell",
  "parking_lot",
  "time",
 ]
@@ -73,12 +72,6 @@ name = "match_cfg"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ffbee8634e0d45d258acb448e7eaab3fce7a0a467395d4d9f228e3c1f01fb2e4"
-
-[[package]]
-name = "once_cell"
-version = "1.17.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
 
 [[package]]
 name = "parking_lot"
@@ -163,7 +156,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "hostname",
- "logfmt",
+ "lumbermill",
 ]
 
 [[package]]

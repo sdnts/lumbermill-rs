@@ -4,10 +4,9 @@ use crate::{
   stdout::StdoutLogger,
   RollInterval,
 };
-use once_cell::sync::OnceCell;
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::OnceLock};
 
-pub static LOGGER: OnceCell<Logger> = OnceCell::new();
+pub static LOGGER: OnceLock<Logger> = OnceLock::new();
 
 #[derive(Debug)]
 pub struct Logger {
