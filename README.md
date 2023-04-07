@@ -5,7 +5,7 @@
 
 Simple structured logging.
 
-![Screenshot of log output](./examples/logs.png)
+![Screenshot of log output](https://raw.githubusercontent.com/sdnts/lumbermill-rs/main/examples/logs.png)
 
 ### Usage
 
