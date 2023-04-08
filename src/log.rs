@@ -125,13 +125,18 @@ impl<'a> Log<'a> {
     let (message, kv) =
       self.kv.split_last().expect("A log message is required");
 
-    use time::format_description::well_known::Rfc3339;
-    write!(w, "ts=",)?;
-    self
-      .timestamp
-      .format_into(w, &Rfc3339)
-      .expect("Timestamp is invalid. This is a bug.");
-    write!(w, " ")?;
+    // I'd like to use `time::format_description::well_known::Rfc3339` here but
+    // it formats time with ns precision, I want ms precision.
+    let t = &self.timestamp;
+    write!(
+      w,
+      "ts={}T{:0>2}:{:0>2}:{:0>2}.{:0>3}Z ",
+      t.date(),
+      t.hour(),
+      t.minute(),
+      t.second(),
+      t.millisecond()
+    )?;
 
     write!(w, "lvl={:?} ", self.level)?;
     write!(w, "msg=\"{}\" ", message.1)?;
@@ -152,13 +157,18 @@ impl<'a> Log<'a> {
 
     write!(w, "{{",)?;
 
-    use time::format_description::well_known::Rfc3339;
-    write!(w, "\"ts\":\"",)?;
-    self
-      .timestamp
-      .format_into(w, &Rfc3339)
-      .expect("Timestamp is invalid. This is a bug.");
-    write!(w, "\",")?;
+    // I'd like to use `time::format_description::well_known::Rfc3339` here but
+    // it formats time with ns precision, I want ms precision.
+    let t = &self.timestamp;
+    write!(
+      w,
+      "\"ts\":\"{}T{:0>2}:{:0>2}:{:0>2}.{:0>3}Z\",",
+      t.date(),
+      t.hour(),
+      t.minute(),
+      t.second(),
+      t.millisecond()
+    )?;
 
     write!(w, "\"lvl\":\"{:?}\",", self.level)?;
     write!(w, "\"msg\":\"{}\",", message.1)?;
@@ -171,5 +181,50 @@ impl<'a> Log<'a> {
     writeln!(w)?;
 
     Ok(())
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn compact() {
+    let log = Log {
+      timestamp: OffsetDateTime::UNIX_EPOCH,
+      level: LogLevel::Info,
+      kv: &[
+        ("key1", format_args!("value1")),
+        ("key1.2", format_args!("value1.2")),
+        ("message", format_args!("logmsg")),
+      ],
+      module: "tests",
+      file: "log.rs",
+      line: 10,
+    };
+    let mut w: Vec<u8> = vec![];
+
+    log.write(&mut w, &LogFormat::Compact).unwrap();
+    assert_eq!(String::from_utf8(w).unwrap(), "ts=1970-01-01T00:00:00.000Z lvl=info msg=\"logmsg\" key1=value1 key1.2=value1.2 mod=tests src=log.rs:10\n");
+  }
+
+  #[test]
+  fn json() {
+    let log = Log {
+      timestamp: OffsetDateTime::UNIX_EPOCH,
+      level: LogLevel::Info,
+      kv: &[
+        ("key1", format_args!("value1")),
+        ("key1.2", format_args!("value1.2")),
+        ("message", format_args!("logmsg")),
+      ],
+      module: "tests",
+      file: "log.rs",
+      line: 10,
+    };
+    let mut w: Vec<u8> = vec![];
+
+    log.write(&mut w, &LogFormat::Json).unwrap();
+    assert_eq!(String::from_utf8(w).unwrap(), "{\"ts\":\"1970-01-01T00:00:00.000Z\",\"lvl\":\"info\",\"msg\":\"logmsg\",\"key1\":\"value1\",\"key1.2\":\"value1.2\",\"mod\":\"tests\",\"src\":\"log.rs:10\"}\n");
   }
 }
