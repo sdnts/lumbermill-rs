@@ -138,8 +138,8 @@ impl<'a> Log<'a> {
       t.millisecond()
     )?;
 
-    write!(w, "lvl={:?} ", self.level)?;
-    write!(w, "msg=\"{}\" ", message.1)?;
+    write!(w, "level={:?} ", self.level)?;
+    write!(w, "message=\"{}\" ", message.1)?;
     kv.iter().try_for_each(|(k, v)| write!(w, "{}={} ", k, v))?;
     write!(w, "mod={} ", self.module)?;
     write!(w, "src={}:{}", self.file, self.line)?;
@@ -170,8 +170,8 @@ impl<'a> Log<'a> {
       t.millisecond()
     )?;
 
-    write!(w, "\"lvl\":\"{:?}\",", self.level)?;
-    write!(w, "\"msg\":\"{}\",", message.1)?;
+    write!(w, "\"level\":\"{:?}\",", self.level)?;
+    write!(w, "\"message\":\"{}\",", message.1)?;
     kv.iter()
       .try_for_each(|(k, v)| write!(w, "\"{}\":\"{}\",", k, v))?;
     write!(w, "\"mod\":\"{}\",", self.module)?;
@@ -205,7 +205,7 @@ mod tests {
     let mut w: Vec<u8> = vec![];
 
     log.write(&mut w, &LogFormat::Compact).unwrap();
-    assert_eq!(String::from_utf8(w).unwrap(), "ts=1970-01-01T00:00:00.000Z lvl=info msg=\"logmsg\" key1=value1 key1.2=value1.2 mod=tests src=log.rs:10\n");
+    assert_eq!(String::from_utf8(w).unwrap(), "ts=1970-01-01T00:00:00.000Z level=info message=\"logmsg\" key1=value1 key1.2=value1.2 mod=tests src=log.rs:10\n");
   }
 
   #[test]
@@ -225,6 +225,6 @@ mod tests {
     let mut w: Vec<u8> = vec![];
 
     log.write(&mut w, &LogFormat::Json).unwrap();
-    assert_eq!(String::from_utf8(w).unwrap(), "{\"ts\":\"1970-01-01T00:00:00.000Z\",\"lvl\":\"info\",\"msg\":\"logmsg\",\"key1\":\"value1\",\"key1.2\":\"value1.2\",\"mod\":\"tests\",\"src\":\"log.rs:10\"}\n");
+    assert_eq!(String::from_utf8(w).unwrap(), "{\"ts\":\"1970-01-01T00:00:00.000Z\",\"level\":\"info\",\"message\":\"logmsg\",\"key1\":\"value1\",\"key1.2\":\"value1.2\",\"mod\":\"tests\",\"src\":\"log.rs:10\"}\n");
   }
 }
