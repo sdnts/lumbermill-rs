@@ -98,6 +98,10 @@ This crate is a stop-gap till `log::kv` stabilizes. It marries `tracing`'s aweso
 `event!` macro to `log`'s simplicity. The plan is to eventually drop the custom
 macros in this crate and integrate with `log` directly.
 
+### MSRV
+
+This crate currently requires a `nightly` version of Rust, and will till Rust v1.70, when `OnceLock` gets stabilized.
+
 ### Credits
 
 - [tracing](https://docs.rs/tracing)
