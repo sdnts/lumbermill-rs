@@ -1,0 +1,9 @@
+[package]
+name = "binary"
+description = "A sample binary that depends on lumbermill"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+library = { path = "../library" }
+lumbermill = { path = "../../" }
