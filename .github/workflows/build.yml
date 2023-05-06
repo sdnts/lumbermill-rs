@@ -9,3 +9,21 @@ jobs:
         with:
           targets: x86_64-unknown-linux-gnu
       - run: cargo test
+
+  library-usage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-unknown-linux-gnu
+      - run: cargo build -p library
+
+  binary-usage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-unknown-linux-gnu
+      - run: cargo build -p binary

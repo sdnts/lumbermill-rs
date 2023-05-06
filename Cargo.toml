@@ -9,6 +9,12 @@ homepage = "https://github.com/sdnts/lumbermill-rs"
 repository = "https://github.com/sdnts/lumbermill-rs"
 version = "0.1.2"
 
+[workspace]
+members = [
+  # Crates here are only used for experimentation, they aren't part of lumbermill
+  "sandbox/*"
+]
+
 [dependencies]
 parking_lot = "0.12.1"
 time = { version = "0.3.20", features = ["std", "formatting"] }

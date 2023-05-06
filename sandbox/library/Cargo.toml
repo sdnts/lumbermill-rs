@@ -1,0 +1,8 @@
+[package]
+name = "library"
+description = "A sample library that depends on lumbermill"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lumbermill = { path = "../../" }
