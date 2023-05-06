@@ -223,14 +223,21 @@ macro_rules! __internal_log {
 
   // entrypoint
   ($lvl:expr, $($fields:tt)+) => {
-    $crate::LOGGER.get().expect("Logger was not initialized").log($crate::Log {
-      timestamp: $crate::OffsetDateTime::now_utc(),
-      level: $lvl,
-      module: module_path!(),
-      file: file!(),
-      line: line!(),
-      kv: $crate::__internal_log!({ }, $($fields)*)
-    });
+    // Ignore returned Option so the lumbermill can be used in other libraries.
+    // It also allows lumbermill to be completely optimized away if a Logger is
+    // never initialized.
+    _ = $crate::LOGGER
+      .get()
+      .map(|l|
+        l.log($crate::Log {
+          timestamp: $crate::OffsetDateTime::now_utc(),
+          level: $lvl,
+          module: module_path!(),
+          file: file!(),
+          line: line!(),
+          kv: $crate::__internal_log!({ }, $($fields)*)
+        })
+      )
   };
 }
 
