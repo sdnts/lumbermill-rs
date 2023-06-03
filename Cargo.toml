@@ -7,7 +7,7 @@ authors = ["Siddhant <sdnts@sdnts.dev>"]
 categories = ["development-tools::debugging"]
 homepage = "https://github.com/sdnts/lumbermill-rs"
 repository = "https://github.com/sdnts/lumbermill-rs"
-version = "0.1.3"
+version = "0.1.4"
 
 [workspace]
 members = [
@@ -17,10 +17,10 @@ members = [
 
 [dependencies]
 parking_lot = "0.12.1"
-time = { version = "0.3.20", features = ["std", "formatting"] }
+time = { version = "0.3.21", features = ["std", "formatting"] }
 
 [dev-dependencies]
-ctor = "0.2.0"
+ctor = "0.2.2"
 
 [[example]]
 name = "01-defaults"
