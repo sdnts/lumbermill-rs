@@ -100,7 +100,7 @@ macros in this crate and integrate with `log` directly.
 
 ### MSRV
 
-This crate currently requires a `nightly` version of Rust, and will till Rust v1.70, when `OnceLock` gets stabilized.
+This crate currently requires at least Rust 1.70
 
 ### Credits
 
