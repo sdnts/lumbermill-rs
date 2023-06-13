@@ -1,10 +1,11 @@
+use std::{path::PathBuf, sync::OnceLock};
+
 use crate::{
   file::FileLogger,
   log::{Log, LogFormat, LogLevel},
   stdout::StdoutLogger,
   RollInterval,
 };
-use std::{path::PathBuf, sync::OnceLock};
 
 pub static LOGGER: OnceLock<Logger> = OnceLock::new();
 
@@ -39,6 +40,10 @@ impl Logger {
 
   pub fn pretty(self) -> Self {
     self.format(LogFormat::Pretty)
+  }
+
+  pub fn pretty_structured(self) -> Self {
+    self.format(LogFormat::PrettyStructured)
   }
 
   pub fn compact(self) -> Self {
