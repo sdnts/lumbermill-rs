@@ -18,6 +18,8 @@
 //!
 //! Macro documentation delves deeper into what you can supply to them. Refer to
 //! it for details.
+//!
+pub use time::OffsetDateTime;
 
 mod file;
 mod log;
@@ -28,7 +30,6 @@ mod stdout;
 pub use file::RollInterval;
 pub use log::{Log, LogFormat, LogLevel};
 pub use logger::{Logger, LOGGER};
-pub use time::OffsetDateTime;
 
 #[cfg(test)]
 #[ctor::ctor]

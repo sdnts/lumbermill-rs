@@ -12,10 +12,11 @@ version = "0.1.4"
 [workspace]
 members = [
   # Crates here are only used for experimentation, they aren't part of lumbermill
-  "sandbox/*"
+  "sandbox/*",
 ]
 
 [dependencies]
+owo-colors = "3.5.0"
 parking_lot = "0.12.1"
 time = { version = "0.3.21", features = ["std", "formatting"] }
 

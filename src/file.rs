@@ -1,12 +1,14 @@
-use crate::log::{Log, LogFormat};
-use parking_lot::Mutex;
 use std::{
   fs::File,
   io::{self, BufWriter, Write},
   path::{Path, PathBuf},
   sync::atomic::{AtomicUsize, Ordering},
 };
+
+use parking_lot::Mutex;
 use time::{Duration, OffsetDateTime, Time};
+
+use crate::log::{Log, LogFormat};
 
 #[derive(Debug)]
 pub enum RollInterval {

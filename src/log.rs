@@ -2,6 +2,8 @@ use std::{
   fmt::{Arguments, Debug, Display},
   io,
 };
+
+use owo_colors::{OwoColorize, XtermColors};
 use time::OffsetDateTime;
 
 #[derive(PartialEq, PartialOrd)]
@@ -15,14 +17,14 @@ pub enum LogLevel {
 }
 
 impl LogLevel {
-  pub fn color(&self) -> u8 {
+  pub fn fg_color(&self) -> XtermColors {
     match self {
-      Self::Trace => 81,
-      Self::Debug => 202,
-      Self::Info => 10,
-      Self::Warn => 11,
-      Self::Error => 9,
-      Self::Fatal => 9,
+      Self::Trace => XtermColors::MalibuBlue,
+      Self::Debug => XtermColors::BlazeOrange,
+      Self::Info => XtermColors::UserGreen,
+      Self::Warn => XtermColors::UserYellow,
+      Self::Error => XtermColors::UserRed,
+      Self::Fatal => XtermColors::UserRed,
     }
   }
 }
@@ -56,6 +58,7 @@ impl Display for LogLevel {
 #[derive(Debug)]
 pub enum LogFormat {
   Pretty,
+  PrettyStructured,
   Compact,
   Json,
 }
@@ -77,6 +80,7 @@ impl<'a> Log<'a> {
   ) -> io::Result<()> {
     match format {
       LogFormat::Pretty => self.pretty(w),
+      LogFormat::PrettyStructured => self.pretty_structured(w),
       LogFormat::Compact => self.compact(w),
       LogFormat::Json => self.json(w),
     }
@@ -90,29 +94,72 @@ impl<'a> Log<'a> {
     let (message, kv) =
       self.kv.split_last().expect("A log message is required");
 
-    write!(
-      w,
-      "\x1B[2m{:0>2}:{:0>2}:{:0>2}.{:0>3}Z\x1B[0m ",
+    let timestamp = format!(
+      "{:0>2}:{:0>2}:{:0>2}.{:0>3}Z",
       self.timestamp.hour(),
       self.timestamp.minute(),
       self.timestamp.second(),
       self.timestamp.millisecond()
-    )?;
+    );
+    write!(w, "{} ", timestamp.dimmed())?;
 
-    write!(w, "\x1B[38;5;{}m{} ", self.level.color(), self.level)?;
+    write!(w, "{} ", self.level.color(self.level.fg_color()))?;
 
     if self.level == LogLevel::Error || self.level == LogLevel::Fatal {
-      write!(w, "\x1B[38;5;9m{}\x1B[0m ", message.1)?;
+      write!(w, "{} ", message.1.red())?;
     } else {
-      write!(w, "\x1B[0m{} ", message.1)?;
+      write!(w, "{} ", message.1)?;
     }
 
-    kv.iter()
-      .try_for_each(|(k, v)| write!(w, "\x1B[2m{}=\x1B[0m{} ", k, v))?;
+    kv.iter().try_for_each(|(k, v)| {
+      write!(w, "{}{}{} ", k.dimmed(), "=".dimmed(), v)
+    })?;
 
-    write!(w, "\x1B[2mmod=\x1B[0m{} ", self.module)?;
-    write!(w, "\x1B[2msrc=\x1B[0m{}:{} ", self.file, self.line)?;
-    write!(w, "\x1B[0m")?;
+    write!(w, "{}{} ", "mod=".dimmed(), self.module)?;
+    write!(w, "{}{}:{} ", "src=".dimmed(), self.file, self.line)?;
+
+    writeln!(w)?;
+
+    Ok(())
+  }
+
+  fn pretty_structured<W: io::Write>(&self, w: &mut W) -> io::Result<()> {
+    // Because of the way our macros are set up, the KV list is ordered, which means
+    // that the message will always be the last element
+    let (message, kv) =
+      self.kv.split_last().expect("A log message is required");
+
+    let timestamp = format!(
+      "{}T{:0>2}:{:0>2}:{:0>2}.{:0>3}Z",
+      self.timestamp.date(),
+      self.timestamp.hour(),
+      self.timestamp.minute(),
+      self.timestamp.second(),
+      self.timestamp.millisecond()
+    );
+    write!(w, "{}{} ", "ts=".dimmed(), timestamp.dimmed())?;
+
+    write!(
+      w,
+      "{}{:?} ",
+      "level=".dimmed(),
+      self.level.color(self.level.fg_color())
+    )?;
+
+    if self.level == LogLevel::Error || self.level == LogLevel::Fatal {
+      write!(w, "{}\"{}\" ", "message=".dimmed(), message.1.red())?;
+    } else {
+      write!(w, "{}\"{}\" ", "message=".dimmed(), message.1)?;
+    }
+
+    kv.iter().try_for_each(|(k, v)| {
+      write!(w, "{}{}{} ", k.dimmed(), "=".dimmed(), v.cyan())
+    })?;
+
+    let module = format!("mod={}", self.module);
+    write!(w, "{} ", module.dimmed())?;
+    let source = format!("src={}:{}", self.file, self.line);
+    write!(w, "{} ", source.dimmed())?;
 
     writeln!(w)?;
 
@@ -203,7 +250,6 @@ mod tests {
       line: 10,
     };
     let mut w: Vec<u8> = vec![];
-
     log.write(&mut w, &LogFormat::Compact).unwrap();
     assert_eq!(String::from_utf8(w).unwrap(), "ts=1970-01-01T00:00:00.000Z level=info message=\"logmsg\" key1=value1 key1.2=value1.2 mod=tests src=log.rs:10\n");
   }
