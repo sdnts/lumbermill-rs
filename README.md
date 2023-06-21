@@ -49,6 +49,7 @@ Logger::builder()
   // Shorthands
   .pretty() //  .format(LogFormat::Pretty)
   .compact() // .format(LogFormat::Compact)
+  .pretty_structured() // .format(LogFormat::PrettyStructured)
   .json() // .format(LogFormat::Json)
 
   // Remember to call `init` after configuration!
